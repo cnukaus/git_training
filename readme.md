@@ -1,11 +1,16 @@
+TEST not maintained
 ### TO DO
 
-READ PHOTO ATTACHMENT in Tweet
-Xunfei or MS OCR to get content from PHOTO
+
+FOCUS on rule of validate data
+Xunfei OCR to get content from PHOTO
 TOKEN Rewards
 Oracle
 Deal with bad quality data (attacks)
+Read ATTACHMENT in Tweet
 
+### to read
+GPT3 (Elon Mask)
 
 ### In Progress
 

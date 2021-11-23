@@ -7,6 +7,7 @@ from collections import Counter
 import twint
 import operator
 import list_graph
+from topology import display_topo
 from langdetect import detect
 
 
@@ -114,9 +115,6 @@ def parse_contents(contents):
             print(content["screen_name"] + "_id:" + content["id"])
 
 
-def count_interactions_of_user():
-    return (replies, retweets,likes)
-
 def highest_talked(twitter_graph):
     '''
     works for list_graph
@@ -128,13 +126,10 @@ def highest_talked(twitter_graph):
                 list_vertex2.append([vertex,edges[0], edges[1]])
 
     df = pd.DataFrame(list_vertex2,columns=['vertex1','vertex2','mentioned'])
-    df.to_csv("network_topo.csv",index=False)
     df['user_id']=df['vertex2'].apply(lambda x:int(json.loads(x)["id"]))
     df['username']=df['vertex2'].apply(lambda x:json.loads(x)["screen_name"])
     df['name']=df['vertex2'].apply(lambda x:json.loads(x)["name"])
-    df_agg=df.groupby(['user_id','username','name'])['mentioned'].sum().to_frame()
-    df_agg['mention_by_#ppl']=df.groupby(['user_id','username','name'])['vertex1'].nunique()
-    return df_agg
+    return df
 
 
 def detect_languages(passage):
@@ -158,8 +153,10 @@ def count_word_freq(df,column_name='tweet'):
 
 if __name__ == '__main__':
 
-    get_tweets("test_6.csv")
-    content_file_name = "test_6.csv"
+    captured_file = "tweet_of_interest.csv"
+    get_tweets(captured_file)
+
+    content_file_name = captured_file
     df = pd.read_csv(content_file_name)
     df[df.isin(["[]"])] = np.nan
     df['lan']=df['tweet'].apply(lambda x:detect_languages(x))
@@ -176,9 +173,16 @@ if __name__ == '__main__':
     build_graph(df,graph_result)
     df_graph = highest_talked(graph_result)
 
+    df_graph.to_csv("network_topo.csv",index=False)
+    display_topo("network_topo.csv")
 
-    df_summary = pd.merge(df_summary,df_graph,how='left',on=['user_id'])
+    df_graph_agg = df_graph.groupby(['user_id','username','name'])['mentioned'].sum().to_frame()
+    df_graph_agg['mention_by_#ppl'] = df_graph.groupby(['user_id','username','name'])['vertex1'].nunique()
+
+
+    df_summary = pd.merge(df_summary,df_graph_agg,how='left',on=['user_id'])
     df_summary.to_csv('final_summary.csv')
+
 
 
 

@@ -3,6 +3,24 @@ import json
 import ipfshttpclient
 import os
 
+def load_config(config_addr):
+    "load JSON"
+    try:
+        with open(config_addr, "r") as f:
+            _spec = json.load(f)
+            return _spec
+    except Exception as err:
+        raise Exception(err)
+
+class nftCreator:
+
+
+    def __init__(
+        self,
+        config_file_path
+        ):
+    self.spec = load_config(config_file_path)
+
 def upload():
     try:
         client = ipfshttpclient.connect()# Connects to: /dns/localhost/tcp/5001/http
